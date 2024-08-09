@@ -1,0 +1,40 @@
+name: Proyecto Basico Devops
+
+on:
+  push:
+    branches:
+      - david
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build Docker image
+        run: docker build -t my-app .
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: my-app:latest 
+          severity: 'CRITICAL,HIGH'
+
+      - name: Push Docker image
+        run: docker push my-app:latest
