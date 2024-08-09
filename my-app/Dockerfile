@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 #Añade un usuario y grupo no privilegiados
-RUN groupadd -r devopsbasic && useradd -r -g appgroup david 
+RUN groupadd -r devopsbasic && useradd -r -g devopsbasic david 
 
 #Establece los permisos para el directorio de trabajo
 RUN chown -R david:devopsbasic /app 
