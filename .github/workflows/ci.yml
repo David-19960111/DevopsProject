@@ -3,7 +3,7 @@ name: Proyecto Basico Devops
 on:
   push:
     branches:
-      - david
+      - developer
 
 jobs:
   build:
