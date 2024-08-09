@@ -20,9 +20,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./my-app
 
       - name: Run tests
         run: npm test
+        working-directory: ./my-app
 
       - name: Build Docker image
         run: docker build -t my-app .
