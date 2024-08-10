@@ -41,8 +41,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
       - name: Build and push
         uses: docker/build-push-action@v6
-        with:
-          context: ./my-app  
+        with:  
           file: ./my-app/Dockerfile
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
