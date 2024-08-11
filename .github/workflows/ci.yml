@@ -29,10 +29,6 @@ jobs:
   trivy-security:
     runs-on: ubuntu-latest
     needs: init
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
