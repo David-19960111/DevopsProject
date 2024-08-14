@@ -109,7 +109,7 @@ jobs:
         application_name: MyApplicationName
         environment_name: MyApplication-Environment
         version_label: 12345
-        region: us-west-2
+        region: ${{ secrets.AWS_REGION }}
         deployment_package: deploy.zip
       
 
