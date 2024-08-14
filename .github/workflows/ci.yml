@@ -10,6 +10,17 @@ env:
   IMAGE_NAME: basicproyectdevops
 
 jobs:
+  SECRET:
+    runs-on: ubuntu-latest
+    name: Secret-Scanner
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Secret Detection
+        uses: zricethezav/gitleaks-action@master
+        continue-on-error: true 
+
   init:
     runs-on: ubuntu-latest
     strategy:
@@ -29,6 +40,7 @@ jobs:
   trivy-security:
     runs-on: ubuntu-latest
     needs: init
+    continue-on-error: true
     permissions:
       contents: write
       security-events: write
@@ -69,3 +81,50 @@ jobs:
           file: ./my-app/Dockerfile
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+  deploy_heroku:
+    runs-on: ubuntu-latest
+    needs: build-docker
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.13.15 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "YOUR APP's NAME" #Must be unique in Heroku
+          heroku_email: "YOUR EMAIL"
+          usedocker: true
+    
+  deploy_aws:
+    runs-on: ubuntu-latest
+    needs: build-docker
+    steps:
+    - uses: actions/checkout@v3
+    - name: Generate deployment package
+      run: zip -r deploy.zip . -x '*.git*'
+    - name: Deploy to EB
+      uses: einaregilsson/beanstalk-deploy@v22
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        application_name: MyApplicationName
+        environment_name: MyApplication-Environment
+        version_label: 12345
+        region: us-west-2
+        deployment_package: deploy.zip
+      
+
+  
+  data_scan:
+    runs-on: ubuntu-latest
+    name: Scan the webapplication
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: master
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'https://www.zaproxy.org'
+
+  
